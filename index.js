@@ -1,14 +1,20 @@
 const puppeteer = require('puppeteer');
+const { exec } = require("node:child_process");
+const { promisify } = require("node:util");
 
 (async () => {
-  // Launch a headless browser
-  const browser = await puppeteer.launch();
+const { stdout: chromiumPath } = await promisify(exec)("which chromium")
 
+const browser = await puppeteer.launch({
+    headless: false,
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    executablePath: chromiumPath.trim()
+  });
   // Create a new page
   const page = await browser.newPage();
 
   // Navigate to a website
-  await page.goto('https://example.com');
+  await page.goto('https://www.google.com');
 
   // Capture a screenshot as a base64-encoded string
   const screenshotBase64 = await page.screenshot({ encoding: 'base64' });
